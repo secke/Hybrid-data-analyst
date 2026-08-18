@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from agent.llm.bedrock_client import BedrockClient
+from agent.llm.protocols import BedrockConverser
 
 REVIEWS_PATH = (
     Path(__file__).resolve().parents[3] / "data" / "processed" / "amazon_reviews_sample.parquet"
@@ -57,7 +57,7 @@ def format_reviews_for_prompt(df: pd.DataFrame, max_chars_per_review: int = 300)
     return "\n".join(lines)
 
 
-def synthesize_reviews(df: pd.DataFrame, client: BedrockClient) -> str:
+def synthesize_reviews(df: pd.DataFrame, client: BedrockConverser) -> str:
     reviews_text = format_reviews_for_prompt(df)
     user_content = (
         f"Échantillon de {len(df)} avis clients:\n\n{reviews_text}\n\nProduis la synthèse."

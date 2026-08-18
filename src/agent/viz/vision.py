@@ -9,7 +9,7 @@ section Phase 3).
 
 from __future__ import annotations
 
-from agent.llm.bedrock_client import BedrockClient
+from agent.llm.protocols import BedrockConverser
 
 SYSTEM_PROMPT = """Tu es un analyste de données qui commente des graphiques. \
 Décris UNIQUEMENT ce qui est visible dans l'image fournie : tendances, \
@@ -38,7 +38,7 @@ def build_vision_messages(question: str, png_bytes: bytes) -> list[dict[str, obj
     ]
 
 
-def comment_on_chart(question: str, png_bytes: bytes, client: BedrockClient) -> str:
+def comment_on_chart(question: str, png_bytes: bytes, client: BedrockConverser) -> str:
     messages = build_vision_messages(question, png_bytes)
     result = client.converse(
         messages=messages, system=SYSTEM_PROMPT, max_tokens=512, temperature=0.0

@@ -8,8 +8,8 @@ section Phase 5).
 
 from __future__ import annotations
 
-from agent.llm.bedrock_client import BedrockClient
 from agent.llm.extraction import extract_fenced_code
+from agent.llm.protocols import BedrockConverser
 from agent.schema.introspect import TableSchema
 
 SYSTEM_PROMPT = """Tu es un expert DuckDB. Tu génères UNE SEULE requête SQL \
@@ -66,7 +66,7 @@ def build_user_message(
 def generate_federated_sql(
     question: str,
     schema_context: str,
-    client: BedrockClient,
+    client: BedrockConverser,
     previous_sql: str | None = None,
     previous_error: str | None = None,
 ) -> str:

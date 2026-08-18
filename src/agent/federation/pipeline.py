@@ -12,7 +12,7 @@ import duckdb
 from agent.audit.log import AuditEntry, log_audit_entry
 from agent.federation.executor import execute_federated
 from agent.federation.generator import build_schema_context, generate_federated_sql
-from agent.llm.bedrock_client import BedrockClient
+from agent.llm.protocols import BedrockConverser
 from agent.schema.introspect import TableSchema
 from agent.sql.executor import ExecutionResult
 from agent.sql.validator import ValidationResult, validate_sql
@@ -43,7 +43,7 @@ def answer_federated_question(
     question: str,
     *,
     con: duckdb.DuckDBPyConnection,
-    bedrock_client: BedrockClient,
+    bedrock_client: BedrockConverser,
     tables: list[TableSchema],
     allowlist: dict[str, set[str]],
     max_attempts: int = MAX_ATTEMPTS,

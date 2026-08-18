@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 import pandas as pd
 
 from agent.audit.log import PythonAuditEntry, log_python_audit_entry
-from agent.llm.bedrock_client import BedrockClient
+from agent.llm.protocols import BedrockConverser
 from agent.sandbox.runner import SandboxResult, run_code
 from agent.viz.generator import generate_chart_code
 from config.settings import get_settings
@@ -48,7 +48,7 @@ def generate_chart(
     question: str,
     df: pd.DataFrame,
     *,
-    bedrock_client: BedrockClient,
+    bedrock_client: BedrockConverser,
     max_attempts: int = MAX_ATTEMPTS,
     sandbox_timeout_seconds: int | None = None,
 ) -> ChartPipelineResult:

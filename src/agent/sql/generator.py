@@ -8,8 +8,8 @@ déclenché par l'agent de build : c'est l'utilisateur qui l'exécute lui-même
 
 from __future__ import annotations
 
-from agent.llm.bedrock_client import BedrockClient
 from agent.llm.extraction import extract_fenced_code
+from agent.llm.protocols import BedrockConverser
 
 SYSTEM_PROMPT = """Tu es un expert PostgreSQL. Tu génères UNE SEULE requête \
 SQL en lecture seule (SELECT uniquement) répondant à la question posée, en \
@@ -45,7 +45,7 @@ def build_user_message(
 def generate_sql(
     question: str,
     schema_context: str,
-    client: BedrockClient,
+    client: BedrockConverser,
     previous_sql: str | None = None,
     previous_error: str | None = None,
 ) -> str:

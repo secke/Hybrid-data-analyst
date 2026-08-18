@@ -10,8 +10,7 @@ from typing import Any
 from qdrant_client import QdrantClient
 
 from agent.audit.log import AuditEntry, log_audit_entry
-from agent.llm.bedrock_client import BedrockClient
-from agent.llm.protocols import Embedder
+from agent.llm.protocols import BedrockConverser, Embedder
 from agent.schema.introspect import TableSchema
 from agent.schema.search import BM25SchemaIndex, hybrid_search
 from agent.sql.executor import ExecutionResult, execute_readonly
@@ -45,7 +44,7 @@ class PipelineResult:
 def answer_question(
     question: str,
     *,
-    bedrock_client: BedrockClient,
+    bedrock_client: BedrockConverser,
     bm25_index: BM25SchemaIndex,
     embedder: Embedder,
     qdrant_client: QdrantClient,

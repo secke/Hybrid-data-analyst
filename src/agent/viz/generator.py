@@ -10,8 +10,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from agent.llm.bedrock_client import BedrockClient
 from agent.llm.extraction import extract_fenced_code
+from agent.llm.protocols import BedrockConverser
 from agent.python_exec.generator import describe_dataframe
 
 SYSTEM_PROMPT = """Tu es un expert en visualisation de données avec Plotly. \
@@ -53,7 +53,7 @@ def build_user_message(
 def generate_chart_code(
     question: str,
     df: pd.DataFrame,
-    client: BedrockClient,
+    client: BedrockConverser,
     previous_code: str | None = None,
     previous_error: str | None = None,
 ) -> str:

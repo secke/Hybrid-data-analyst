@@ -9,13 +9,14 @@ Principe non négociable : **le LLM ne calcule jamais de chiffre lui-même**.
 Il génère du SQL/Python, exécuté de façon déterministe en local ; les
 résultats reviennent au LLM pour interprétation uniquement.
 
-Ce dépôt est construit incrément par incrément. Statut actuel : **Phase 7 —
-Évaluation (dernière phase du plan initial)**, sur la base de la Phase 6
-(rapports, traçabilité, feedback), de la Phase 5 (analyse multi-sources), de
-la Phase 4 (génération de fichiers), de la Phase 3 (visualisation avec
-relecture vision), de la Phase 2 (sandbox d'exécution Python), de la Phase 1
-(Text-to-SQL avec garde-fous) et de la Phase 0 (socle infra + ingestion des
-4 sources de données). Les 7 phases prévues sont complètes.
+Ce dépôt est construit incrément par incrément. Statut actuel : **Phase 8 —
+Interface agent (LangGraph + Chainlit)**, au-delà des 7 phases du plan
+initial : Phase 7 (évaluation), Phase 6 (rapports, traçabilité, feedback),
+Phase 5 (analyse multi-sources), Phase 4 (génération de fichiers), Phase 3
+(visualisation avec relecture vision), Phase 2 (sandbox d'exécution Python),
+Phase 1 (Text-to-SQL avec garde-fous) et Phase 0 (socle infra + ingestion des
+4 sources de données). Les 7 phases prévues sont complètes ; la Phase 8
+expose l'ensemble de ces capacités derrière un agent conversationnel unique.
 
 > **Identité (Phase 6)** : le stack technique original prévoit Keycloak pour
 > l'authentification, mais aucune phase de ce projet ne le déploie (pas dans
@@ -314,6 +315,29 @@ Produit un tableau d'exactitude par catégorie, un tableau de coût par
 catégorie, le résultat des tests d'injection, et un rapport JSON complet
 (`data/artifacts/eval_report.json`) avec le détail question par question.
 
+### 15. Interface agent (Phase 8) — à exécuter vous-même
+
+Interface de chat (Chainlit) branchée sur un agent LangGraph qui décide seul,
+via l'API Bedrock Converse en mode `toolConfig`, quel(s) outil(s) invoquer
+parmi les pipelines des Phases 1-6 (`query_data`, `query_federated_data`,
+`compute`, `visualize`, `export_files`, `generate_report`,
+`synthesize_reviews` — voir `agent/orchestrator/tools.py`). L'agent boucle
+outil après outil (limite de 8 appels Bedrock par tour,
+`agent/orchestrator/graph.py`) jusqu'à répondre en langage naturel. L'état
+de session (dernier DataFrame/SQL/graphique récupéré) est conservé pour
+toute la conversation, ce qui permet d'enchaîner les questions ("trace un
+graphique" après une question SQL, sans redemander les données). Chaque
+message de l'utilisateur déclenche un ou plusieurs vrais appels Bedrock :
+
+```bash
+export PYTHONPATH="src:."
+uv run chainlit run app/chainlit_app.py
+```
+
+Les artefacts (SQL, tableau, graphique, liens de fichiers, rapport) sont
+affichés au fur et à mesure ; chaque réponse propose un feedback 👍/👎
+enregistré dans la base de feedback (Phase 6, `agent_feedback`).
+
 ## Architecture
 
 | Couche | Choix | Statut |
@@ -342,8 +366,8 @@ catégorie, le résultat des tests d'injection, et un rapport JSON complet
 | Feedback utilisateur | Table Postgres `agent_feedback` (requêtes validées) | ✅ Phase 6 |
 | Évaluation | 50 questions + SQL de référence, exactitude d'exécution | ✅ Phase 7 |
 | Robustesse | Résistance à l'injection SQL (vérifiée sans LLM) | ✅ Phase 7 |
-| Orchestration agentique | LangGraph | non planifiée dans les 7 phases |
-| Frontend | Chainlit | non planifiée dans les 7 phases |
+| Orchestration agentique | LangGraph (agent à outils, `toolConfig` Bedrock) | ✅ Phase 8 |
+| Frontend | Chainlit | ✅ Phase 8 |
 
 ## Structure du projet
 
@@ -368,6 +392,10 @@ src/agent/
   feedback/                  Base de feedback utilisateur - requêtes validées (Phase 6)
   evaluation/                Comparaison de résultats, robustesse, coût par catégorie (Phase 7)
   audit/                     Journal SQL/Python (accepté/rejeté/erreur) + journal.py (chaîne de hash)
+  orchestrator/              Agent LangGraph (Phase 8) : contexte partagé, état de session,
+                              outils (wrappers des pipelines Phases 1-6), graphe agent/outils
+app/
+  chainlit_app.py            Interface de chat Chainlit (Phase 8) branchée sur l'agent LangGraph
 sandbox/
   Dockerfile                 Image d'exécution (pandas/numpy/scipy/statsmodels/sklearn/plotly+Chrome)
   exec_wrapper.py            Exécuté dans le conteneur : charge df, exec(code), sérialise `result`/`fig`
