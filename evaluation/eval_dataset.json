@@ -1,0 +1,302 @@
+[
+  {
+    "id": 1,
+    "category": "simple_select",
+    "question": "Combien y a-t-il de clients au total ?",
+    "sql": "SELECT count(*) AS n FROM customers"
+  },
+  {
+    "id": 2,
+    "category": "simple_select",
+    "question": "Combien y a-t-il de produits actuellement discontinués ?",
+    "sql": "SELECT count(*) AS n FROM products WHERE discontinued = 1"
+  },
+  {
+    "id": 3,
+    "category": "simple_select",
+    "question": "Quels sont les noms des catégories de produits ?",
+    "sql": "SELECT category_name FROM categories ORDER BY category_name"
+  },
+  {
+    "id": 4,
+    "category": "simple_select",
+    "question": "Combien de commandes ont été passées vers le Brésil ?",
+    "sql": "SELECT count(*) AS n FROM orders WHERE ship_country = 'Brazil'"
+  },
+  {
+    "id": 5,
+    "category": "simple_select",
+    "question": "Quel est le nombre total de transporteurs (shippers) ?",
+    "sql": "SELECT count(*) AS n FROM shippers"
+  },
+  {
+    "id": 6,
+    "category": "aggregation",
+    "question": "Quel est le prix unitaire moyen des produits ?",
+    "sql": "SELECT round(avg(unit_price)::numeric, 2) AS avg_price FROM products"
+  },
+  {
+    "id": 7,
+    "category": "aggregation",
+    "question": "Quel est le montant total du fret (freight) toutes commandes confondues ?",
+    "sql": "SELECT round(sum(freight)::numeric, 2) AS total_freight FROM orders"
+  },
+  {
+    "id": 8,
+    "category": "aggregation",
+    "question": "Combien de commandes chaque employé a-t-il gérées ?",
+    "sql": "SELECT employee_id, count(*) AS n FROM orders GROUP BY employee_id ORDER BY employee_id"
+  },
+  {
+    "id": 9,
+    "category": "aggregation",
+    "question": "Quelle est la quantité totale commandée par produit (order_details) ?",
+    "sql": "SELECT product_id, sum(quantity) AS total_qty FROM order_details GROUP BY product_id ORDER BY product_id"
+  },
+  {
+    "id": 10,
+    "category": "aggregation",
+    "question": "Quel est le nombre de produits par catégorie ?",
+    "sql": "SELECT category_id, count(*) AS n FROM products GROUP BY category_id ORDER BY category_id"
+  },
+  {
+    "id": 11,
+    "category": "aggregation",
+    "question": "Quelle est la remise (discount) moyenne appliquée sur les lignes de commande ?",
+    "sql": "SELECT round(avg(discount)::numeric, 4) AS avg_discount FROM order_details"
+  },
+  {
+    "id": 12,
+    "category": "join",
+    "question": "Quels sont les noms des entreprises clientes et le pays associé, pour les clients du Mexique ?",
+    "sql": "SELECT company_name, country FROM customers WHERE country = 'Mexico' ORDER BY company_name"
+  },
+  {
+    "id": 13,
+    "category": "join",
+    "question": "Pour chaque commande, quel est le nom de l'entreprise cliente associée (10 premières par order_id) ?",
+    "sql": "SELECT o.order_id, c.company_name FROM orders o JOIN customers c ON o.customer_id = c.customer_id ORDER BY o.order_id LIMIT 10"
+  },
+  {
+    "id": 14,
+    "category": "join",
+    "question": "Quels sont les noms des produits et de leur catégorie, pour les produits de la catégorie 'Beverages' ?",
+    "sql": "SELECT p.product_name, c.category_name FROM products p JOIN categories c ON p.category_id = c.category_id WHERE c.category_name = 'Beverages' ORDER BY p.product_name"
+  },
+  {
+    "id": 15,
+    "category": "join",
+    "question": "Quels sont les noms de famille des employés et le nombre de commandes qu'ils ont gérées ?",
+    "sql": "SELECT e.last_name, count(o.order_id) AS n FROM employees e JOIN orders o ON e.employee_id = o.employee_id GROUP BY e.last_name ORDER BY e.last_name"
+  },
+  {
+    "id": 16,
+    "category": "join",
+    "question": "Quels sont les noms des fournisseurs et le nombre de produits qu'ils fournissent ?",
+    "sql": "SELECT s.company_name, count(p.product_id) AS n FROM suppliers s JOIN products p ON s.supplier_id = p.supplier_id GROUP BY s.company_name ORDER BY s.company_name"
+  },
+  {
+    "id": 17,
+    "category": "join",
+    "question": "Quels sont les noms des transporteurs utilisés et le nombre de commandes livrées par chacun ?",
+    "sql": "SELECT s.company_name, count(o.order_id) AS n FROM shippers s JOIN orders o ON s.shipper_id = o.ship_via GROUP BY s.company_name ORDER BY s.company_name"
+  },
+  {
+    "id": 18,
+    "category": "multi_join",
+    "question": "Pour les 5 premières lignes de commande (par order_id), quel est le nom du client, le nom du produit et la quantité commandée ?",
+    "sql": "SELECT o.order_id, c.company_name, p.product_name, od.quantity FROM order_details od JOIN orders o ON od.order_id = o.order_id JOIN customers c ON o.customer_id = c.customer_id JOIN products p ON od.product_id = p.product_id ORDER BY o.order_id, p.product_name LIMIT 5"
+  },
+  {
+    "id": 19,
+    "category": "multi_join",
+    "question": "Quel est le chiffre d'affaires (quantité x prix unitaire) par catégorie de produits ?",
+    "sql": "SELECT c.category_name, round(sum(od.quantity * od.unit_price)::numeric, 2) AS revenue FROM order_details od JOIN products p ON od.product_id = p.product_id JOIN categories c ON p.category_id = c.category_id GROUP BY c.category_name ORDER BY c.category_name"
+  },
+  {
+    "id": 20,
+    "category": "multi_join",
+    "question": "Quel est le chiffre d'affaires total généré par chaque employé (via les commandes qu'il a gérées) ?",
+    "sql": "SELECT e.last_name, round(sum(od.quantity * od.unit_price)::numeric, 2) AS revenue FROM employees e JOIN orders o ON e.employee_id = o.employee_id JOIN order_details od ON o.order_id = od.order_id GROUP BY e.last_name ORDER BY e.last_name"
+  },
+  {
+    "id": 21,
+    "category": "multi_join",
+    "question": "Quels sont les noms des produits fournis par des fournisseurs situés en Allemagne (Germany) ?",
+    "sql": "SELECT p.product_name, s.company_name FROM products p JOIN suppliers s ON p.supplier_id = s.supplier_id WHERE s.country = 'Germany' ORDER BY p.product_name"
+  },
+  {
+    "id": 22,
+    "category": "multi_join",
+    "question": "Quel est le nombre de commandes par pays de client, en utilisant la table customers (pas ship_country) ?",
+    "sql": "SELECT c.country, count(o.order_id) AS n FROM customers c JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.country ORDER BY c.country"
+  },
+  {
+    "id": 23,
+    "category": "date_filter",
+    "question": "Combien de commandes ont été passées en 1997 ?",
+    "sql": "SELECT count(*) AS n FROM orders WHERE extract(year FROM order_date) = 1997"
+  },
+  {
+    "id": 24,
+    "category": "date_filter",
+    "question": "Combien de commandes ont été passées entre le 1er janvier 1997 et le 31 mars 1997 ?",
+    "sql": "SELECT count(*) AS n FROM orders WHERE order_date >= '1997-01-01' AND order_date <= '1997-03-31'"
+  },
+  {
+    "id": 25,
+    "category": "date_filter",
+    "question": "Combien de commandes n'ont jamais été expédiées (shipped_date est NULL) ?",
+    "sql": "SELECT count(*) AS n FROM orders WHERE shipped_date IS NULL"
+  },
+  {
+    "id": 26,
+    "category": "date_filter",
+    "question": "Quel est le nombre de commandes par mois pour l'année 1997 ?",
+    "sql": "SELECT extract(month FROM order_date) AS month, count(*) AS n FROM orders WHERE extract(year FROM order_date) = 1997 GROUP BY 1 ORDER BY 1"
+  },
+  {
+    "id": 27,
+    "category": "date_filter",
+    "question": "Quelle est la date de la commande la plus ancienne et de la plus récente ?",
+    "sql": "SELECT min(order_date) AS earliest, max(order_date) AS latest FROM orders"
+  },
+  {
+    "id": 28,
+    "category": "top_n",
+    "question": "Quels sont les 5 produits les plus chers (par prix unitaire) ?",
+    "sql": "SELECT product_name, unit_price FROM products ORDER BY unit_price DESC LIMIT 5"
+  },
+  {
+    "id": 29,
+    "category": "top_n",
+    "question": "Quels sont les 3 clients ayant passé le plus de commandes ?",
+    "sql": "SELECT customer_id, count(*) AS n FROM orders GROUP BY customer_id ORDER BY n DESC LIMIT 3"
+  },
+  {
+    "id": 30,
+    "category": "top_n",
+    "question": "Quelles sont les 5 commandes avec le fret le plus élevé ?",
+    "sql": "SELECT order_id, freight FROM orders ORDER BY freight DESC LIMIT 5"
+  },
+  {
+    "id": 31,
+    "category": "top_n",
+    "question": "Quel est le produit le moins cher (prix unitaire) ?",
+    "sql": "SELECT product_name, unit_price FROM products ORDER BY unit_price ASC LIMIT 1"
+  },
+  {
+    "id": 32,
+    "category": "top_n",
+    "question": "Quels sont les 3 pays de destination avec le plus grand nombre de commandes ?",
+    "sql": "SELECT ship_country, count(*) AS n FROM orders GROUP BY ship_country ORDER BY n DESC LIMIT 3"
+  },
+  {
+    "id": 33,
+    "category": "having",
+    "question": "Quels employés ont géré plus de 100 commandes ?",
+    "sql": "SELECT employee_id, count(*) AS n FROM orders GROUP BY employee_id HAVING count(*) > 100 ORDER BY employee_id"
+  },
+  {
+    "id": 34,
+    "category": "having",
+    "question": "Quelles catégories de produits comptent plus de 10 produits ?",
+    "sql": "SELECT category_id, count(*) AS n FROM products GROUP BY category_id HAVING count(*) > 10 ORDER BY category_id"
+  },
+  {
+    "id": 35,
+    "category": "having",
+    "question": "Quels clients ont passé plus de 5 commandes ?",
+    "sql": "SELECT customer_id, count(*) AS n FROM orders GROUP BY customer_id HAVING count(*) > 5 ORDER BY customer_id"
+  },
+  {
+    "id": 36,
+    "category": "having",
+    "question": "Quels pays de destination ont reçu moins de 5 commandes ?",
+    "sql": "SELECT ship_country, count(*) AS n FROM orders GROUP BY ship_country HAVING count(*) < 5 ORDER BY ship_country"
+  },
+  {
+    "id": 37,
+    "category": "subquery",
+    "question": "Quels produits ont un prix unitaire supérieur au prix unitaire moyen de tous les produits ?",
+    "sql": "SELECT product_name, unit_price FROM products WHERE unit_price > (SELECT avg(unit_price) FROM products) ORDER BY product_name"
+  },
+  {
+    "id": 38,
+    "category": "subquery",
+    "question": "Quels clients n'ont jamais passé de commande ?",
+    "sql": "SELECT customer_id, company_name FROM customers WHERE customer_id NOT IN (SELECT DISTINCT customer_id FROM orders WHERE customer_id IS NOT NULL) ORDER BY customer_id"
+  },
+  {
+    "id": 39,
+    "category": "subquery",
+    "question": "Quels produits n'ont jamais été commandés (absents de order_details) ?",
+    "sql": "SELECT product_id, product_name FROM products WHERE product_id NOT IN (SELECT DISTINCT product_id FROM order_details) ORDER BY product_id"
+  },
+  {
+    "id": 40,
+    "category": "subquery",
+    "question": "Quel est le nom du produit le plus cher ?",
+    "sql": "SELECT product_name FROM products WHERE unit_price = (SELECT max(unit_price) FROM products)"
+  },
+  {
+    "id": 41,
+    "category": "subquery",
+    "question": "Quels employés ont géré un nombre de commandes supérieur à la moyenne des commandes gérées par employé ?",
+    "sql": "SELECT employee_id, count(*) AS n FROM orders GROUP BY employee_id HAVING count(*) > (SELECT avg(cnt) FROM (SELECT count(*) AS cnt FROM orders GROUP BY employee_id) sub) ORDER BY employee_id"
+  },
+  {
+    "id": 42,
+    "category": "null_handling",
+    "question": "Combien de clients n'ont pas de région (region) renseignée ?",
+    "sql": "SELECT count(*) AS n FROM customers WHERE region IS NULL"
+  },
+  {
+    "id": 43,
+    "category": "null_handling",
+    "question": "Combien de commandes ont un ship_region non renseigné (NULL) ?",
+    "sql": "SELECT count(*) AS n FROM orders WHERE ship_region IS NULL"
+  },
+  {
+    "id": 44,
+    "category": "null_handling",
+    "question": "Combien d'employés n'ont pas de responsable direct (reports_to est NULL) ?",
+    "sql": "SELECT count(*) AS n FROM employees WHERE reports_to IS NULL"
+  },
+  {
+    "id": 45,
+    "category": "null_handling",
+    "question": "Combien de produits ont un fournisseur non renseigné (supplier_id NULL) ?",
+    "sql": "SELECT count(*) AS n FROM products WHERE supplier_id IS NULL"
+  },
+  {
+    "id": 46,
+    "category": "string_matching",
+    "question": "Quels sont les noms des entreprises clientes commençant par la lettre 'A' ?",
+    "sql": "SELECT company_name FROM customers WHERE company_name LIKE 'A%' ORDER BY company_name"
+  },
+  {
+    "id": 47,
+    "category": "string_matching",
+    "question": "Quels produits ont 'Chocolate' dans leur nom ?",
+    "sql": "SELECT product_name FROM products WHERE product_name ILIKE '%chocolate%' ORDER BY product_name"
+  },
+  {
+    "id": 48,
+    "category": "string_matching",
+    "question": "Quels employés ont le titre 'Sales Representative' ?",
+    "sql": "SELECT first_name, last_name FROM employees WHERE title = 'Sales Representative' ORDER BY last_name"
+  },
+  {
+    "id": 49,
+    "category": "string_matching",
+    "question": "Quels clients ont un nom de contact contenant 'Maria' ?",
+    "sql": "SELECT company_name, contact_name FROM customers WHERE contact_name ILIKE '%maria%' ORDER BY company_name"
+  },
+  {
+    "id": 50,
+    "category": "string_matching",
+    "question": "Quels fournisseurs ont leur siège dans une ville commençant par 'Lon' (ex: London) ?",
+    "sql": "SELECT company_name, city FROM suppliers WHERE city LIKE 'Lon%' ORDER BY company_name"
+  }
+]

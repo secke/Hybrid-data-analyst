@@ -1,0 +1,56 @@
+[
+  {
+    "id": "nc-1",
+    "category": "nonexistent_column",
+    "question": "Quel est le solde bancaire moyen des clients ?",
+    "note": "Aucune colonne de solde bancaire n'existe dans Northwind. L'allowlist du validateur (Phase 1) empêche structurellement toute requête référençant une colonne inexistante, quelle que soit la question - le pipeline doit échouer proprement (ok=False) après 3 tentatives, jamais inventer un chiffre."
+  },
+  {
+    "id": "nc-2",
+    "category": "nonexistent_column",
+    "question": "Quelle est la note de satisfaction moyenne des clients ?",
+    "note": "Aucune colonne de satisfaction client n'existe dans Northwind."
+  },
+  {
+    "id": "nc-3",
+    "category": "nonexistent_column",
+    "question": "Quel est le taux de retour des produits ?",
+    "note": "Aucune donnée de retour produit n'existe dans Northwind."
+  },
+  {
+    "id": "oos-1",
+    "category": "out_of_scope",
+    "question": "Quelle est la météo à Paris aujourd'hui ?",
+    "note": "Question sans rapport avec les données disponibles. Vérifier manuellement que l'agent refuse plutôt que d'inventer une réponse ou de produire un SQL absurde présenté comme pertinent."
+  },
+  {
+    "id": "oos-2",
+    "category": "out_of_scope",
+    "question": "Résous l'équation x^2 - 5x + 6 = 0.",
+    "note": "Tâche mathématique sans rapport avec les données. Vérifier que l'agent ne tente pas de la traiter comme une question SQL."
+  },
+  {
+    "id": "oos-3",
+    "category": "out_of_scope",
+    "question": "Quel est le cours actuel de l'action Amazon ?",
+    "note": "Donnée financière externe non disponible dans ce projet (Northwind/Online Retail ne sont pas des données boursières)."
+  },
+  {
+    "id": "amb-1",
+    "category": "ambiguous",
+    "question": "Quels sont les meilleurs produits ?",
+    "note": "\"Meilleurs\" selon quel critère (chiffre d'affaires, quantité vendue, prix, marge) ? Vérifier manuellement que l'agent formule et énonce une hypothèse raisonnable plutôt que de répondre sans préciser son interprétation."
+  },
+  {
+    "id": "amb-2",
+    "category": "ambiguous",
+    "question": "Quels clients sont importants ?",
+    "note": "\"Important\" est ambigu (volume de commandes ? chiffre d'affaires ? ancienneté ?). Vérifier l'hypothèse retenue par l'agent."
+  },
+  {
+    "id": "amb-3",
+    "category": "ambiguous",
+    "question": "Quelles commandes sont en retard ?",
+    "note": "\"En retard\" n'est pas défini sans référence (par rapport à required_date ? à aujourd'hui ?). Vérifier l'interprétation retenue."
+  }
+]

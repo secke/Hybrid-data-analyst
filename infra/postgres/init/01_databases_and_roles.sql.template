@@ -1,0 +1,18 @@
+-- Exécuté une seule fois à la création du volume Postgres, via 00_init.sh
+-- qui injecte les mots de passe comme variables psql (:'app_pw', :'ro_pw'),
+-- jamais en dur dans ce fichier versionné.
+
+CREATE DATABASE northwind;
+CREATE DATABASE langfuse;
+
+CREATE ROLE agent_app LOGIN PASSWORD :'app_pw';
+CREATE ROLE agent_readonly LOGIN PASSWORD :'ro_pw';
+
+GRANT ALL PRIVILEGES ON DATABASE northwind TO agent_app;
+
+\connect northwind
+ALTER SCHEMA public OWNER TO agent_app;
+GRANT USAGE ON SCHEMA public TO agent_readonly;
+-- Le SELECT sur les tables Northwind est accordé à agent_readonly par
+-- load_northwind.py une fois le schéma chargé (les tables n'existent pas
+-- encore à ce stade de l'init Postgres).
